@@ -34,10 +34,15 @@ var (
 			v2.ResourceType_TRAIT_USER,
 		},
 	}
+	resourceTypeAccount = &v2.ResourceType{
+		Id:          "account",
+		DisplayName: "Account",
+	}
 )
 
 type Duo struct {
-	client *duo.Client
+	client         *duo.Client
+	integrationKey string
 }
 
 func (d *Duo) ResourceSyncers(ctx context.Context) []connectorbuilder.ResourceSyncer {
@@ -45,6 +50,7 @@ func (d *Duo) ResourceSyncers(ctx context.Context) []connectorbuilder.ResourceSy
 		userBuilder(d.client),
 		groupBuilder(d.client),
 		adminBuilder(d.client),
+		accountBuilder(d.client, d.integrationKey),
 	}
 }
 
@@ -72,6 +78,7 @@ func New(ctx context.Context, integrationKey string, secretKey string, apiHostna
 	}
 
 	return &Duo{
-		client: duo.NewClient(integrationKey, secretKey, apiHostname, httpClient),
+		client:         duo.NewClient(integrationKey, secretKey, apiHostname, httpClient),
+		integrationKey: integrationKey,
 	}, nil
 }

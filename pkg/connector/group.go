@@ -33,7 +33,7 @@ func groupBuilder(client *duo.Client) *groupResourceType {
 }
 
 // Create a new connector resource for a Duo group.
-func groupResource(ctx context.Context, group duo.Group) (*v2.Resource, error) {
+func groupResource(ctx context.Context, group duo.Group, parentResourceID *v2.ResourceId) (*v2.Resource, error) {
 	profile := make(map[string]interface{})
 	profile["group_id"] = group.GroupID
 	profile["group_name"] = group.Name
@@ -41,13 +41,15 @@ func groupResource(ctx context.Context, group duo.Group) (*v2.Resource, error) {
 	groupTrait := []rs.GroupTraitOption{
 		rs.WithGroupProfile(profile),
 	}
-	groupOptions := []rs.ResourceOption{
-		rs.WithAnnotation(
-			&v2.ChildResourceType{ResourceTypeId: resourceTypeUser.Id},
-		),
-	}
 
-	ret, err := rs.NewGroupResource(group.Name, resourceTypeGroup, group.GroupID, groupTrait, groupOptions...)
+	ret, err := rs.NewGroupResource(
+		group.Name,
+		resourceTypeGroup,
+		group.GroupID,
+		groupTrait,
+		rs.WithParentResourceID(parentResourceID),
+	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +57,11 @@ func groupResource(ctx context.Context, group duo.Group) (*v2.Resource, error) {
 	return ret, nil
 }
 
-func (o *groupResourceType) List(ctx context.Context, resourceId *v2.ResourceId, token *pagination.Token) ([]*v2.Resource, string, annotations.Annotations, error) {
+func (o *groupResourceType) List(ctx context.Context, parentId *v2.ResourceId, token *pagination.Token) ([]*v2.Resource, string, annotations.Annotations, error) {
+	if parentId == nil {
+		return nil, "", nil, nil
+	}
+
 	var pageToken string
 	bag, err := parsePageToken(token.Token, &v2.ResourceId{ResourceType: resourceTypeGroup.Id})
 	if err != nil {
@@ -76,7 +82,7 @@ func (o *groupResourceType) List(ctx context.Context, resourceId *v2.ResourceId,
 
 	var rv []*v2.Resource
 	for _, group := range groups {
-		gr, err := groupResource(ctx, group)
+		gr, err := groupResource(ctx, group, parentId)
 		if err != nil {
 			return nil, "", nil, err
 		}

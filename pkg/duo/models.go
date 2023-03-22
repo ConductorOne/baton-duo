@@ -24,3 +24,7 @@ type Admin struct {
 	Role    string `json:"role"`
 	Status  string `json:"status"`
 }
+
+type Account struct {
+	Name string `json:"name"`
+}

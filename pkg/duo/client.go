@@ -85,6 +85,12 @@ type UserResponse struct {
 	Response User   `json:"response"`
 }
 
+type AccountResponse struct {
+	ErrorResponse
+	Stat     string  `json:"stat"`
+	Response Account `json:"response"`
+}
+
 type IntegrationResponse struct {
 	ErrorResponse
 	Stat     string `json:"stat"`
@@ -306,6 +312,27 @@ func (c *Client) GetIntegration(ctx context.Context) (IntegrationResponse, error
 	}
 
 	return res, nil
+}
+
+// GetAccount returns account info.
+func (c *Client) GetAccount(ctx context.Context) (Account, error) {
+	uri := "/admin/v1/settings"
+	accountUrl := fmt.Sprint(c.baseUrl, uri)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, accountUrl, nil)
+	if err != nil {
+		return Account{}, err
+	}
+
+	var res AccountResponse
+	if err := c.doRequest(uri, req, &res, nil); err != nil {
+		return Account{}, err
+	}
+
+	if res.Stat == requestFailedStat {
+		return Account{}, fmt.Errorf("error fetching account: %s", res.Message)
+	}
+
+	return res.Response, nil
 }
 
 func (c *Client) doRequest(uri string, req *http.Request, resType interface{}, params url.Values) error {
