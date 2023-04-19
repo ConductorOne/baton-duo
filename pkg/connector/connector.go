@@ -38,6 +38,13 @@ var (
 		Id:          "account",
 		DisplayName: "Account",
 	}
+	resourceTypeRole = &v2.ResourceType{
+		Id:          "role",
+		DisplayName: "Role",
+		Traits: []v2.ResourceType_Trait{
+			v2.ResourceType_TRAIT_ROLE,
+		},
+	}
 )
 
 type Duo struct {
@@ -51,6 +58,7 @@ func (d *Duo) ResourceSyncers(ctx context.Context) []connectorbuilder.ResourceSy
 		groupBuilder(d.client),
 		adminBuilder(d.client),
 		accountBuilder(d.client, d.integrationKey),
+		roleBuilder(d.client),
 	}
 }
 
