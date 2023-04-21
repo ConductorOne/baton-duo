@@ -1,9 +1,9 @@
 module github.com/ConductorOne/baton-duo
 
-go 1.19
+go 1.20
 
 require (
-	github.com/conductorone/baton-sdk v0.0.24
+	github.com/conductorone/baton-sdk v0.0.26
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/spf13/cobra v1.6.1
 	go.uber.org/zap v1.24.0
