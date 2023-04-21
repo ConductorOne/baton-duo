@@ -3,6 +3,7 @@ package connector
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/ConductorOne/baton-duo/pkg/duo"
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
@@ -22,9 +23,18 @@ func (o *userResourceType) ResourceType(_ context.Context) *v2.ResourceType {
 
 // Create a new connector resource for a Duo user.
 func userResource(ctx context.Context, user *duo.User, parentResourceID *v2.ResourceId) (*v2.Resource, error) {
+	names := strings.SplitN(user.RealName, " ", 2)
+	var firstName, lastName string
+	switch len(names) {
+	case 1:
+		firstName = names[0]
+	case 2:
+		firstName = names[0]
+		lastName = names[1]
+	}
 	profile := map[string]interface{}{
-		"first_name": user.FirstName,
-		"last_name":  user.LastName,
+		"first_name": firstName,
+		"last_name":  lastName,
 		"login":      user.Email,
 		"user_id":    user.UserID,
 	}
