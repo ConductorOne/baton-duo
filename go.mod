@@ -1,4 +1,4 @@
-module github.com/ConductorOne/baton-duo
+module github.com/conductorone/baton-duo
 
 go 1.20
 
