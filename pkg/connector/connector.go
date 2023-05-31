@@ -66,6 +66,7 @@ func (d *Duo) ResourceSyncers(ctx context.Context) []connectorbuilder.ResourceSy
 func (d *Duo) Metadata(ctx context.Context) (*v2.ConnectorMetadata, error) {
 	return &v2.ConnectorMetadata{
 		DisplayName: "Duo",
+		Description: "Connector syncing users, groups, admins, accounts, and roles from Duo to Baton.",
 	}, nil
 }
 
