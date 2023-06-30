@@ -335,15 +335,69 @@ func (c *Client) GetAccount(ctx context.Context) (Account, error) {
 	return res.Response, nil
 }
 
+// AddUserToGroup adds a user to a group.
+func (c *Client) AddUserToGroup(ctx context.Context, groupId, userId string) error {
+	uri := fmt.Sprint("/admin/v1/users/", userId, "/groups")
+	addUserUrl := fmt.Sprint(c.baseUrl, uri)
+	data := url.Values{}
+	data.Set("group_id", groupId)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, addUserUrl, strings.NewReader(data.Encode()))
+	if err != nil {
+		return err
+	}
+
+	var res struct {
+		Stat string `json:"stat"`
+		ErrorResponse
+	}
+
+	if err := c.doRequest(uri, req, &res, data); err != nil {
+		return err
+	}
+
+	if res.Stat == requestFailedStat {
+		return fmt.Errorf("error adding user to group: %s", res.Message)
+	}
+
+	return nil
+}
+
+// RemoveUserFromGroup removes a user from a group.
+func (c *Client) RemoveUserFromGroup(ctx context.Context, groupId, userId string) error {
+	uri := fmt.Sprint("/admin/v1/users/", userId, "/groups/", groupId)
+	removeUserUrl := fmt.Sprint(c.baseUrl, uri)
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, removeUserUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	var res struct {
+		Stat string `json:"stat"`
+		ErrorResponse
+	}
+
+	if err := c.doRequest(uri, req, &res, nil); err != nil {
+		return err
+	}
+
+	if res.Stat == requestFailedStat {
+		return fmt.Errorf("error removing user from group: %s", res.Message)
+	}
+
+	return nil
+}
+
 func (c *Client) doRequest(uri string, req *http.Request, resType interface{}, params url.Values) error {
 	now := time.Now().UTC().Format(time.RFC1123Z)
-	signature, err := sign(c.integrationKey, c.secretKey, "GET", c.host, uri, now, params)
+	signature, err := sign(c.integrationKey, c.secretKey, req.Method, c.host, uri, now, params)
 	if err != nil {
 		return err
 	}
 
 	req.Header.Add("Authorization", signature)
 	req.Header.Add("Date", now)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
