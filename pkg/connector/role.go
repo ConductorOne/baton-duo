@@ -46,7 +46,7 @@ var roles = []string{
 
 // Create a new connector resource for a Duo role.
 func roleResource(ctx context.Context, role string, parentResourceID *v2.ResourceId) (*v2.Resource, error) {
-	roleDisplayName := titleCaser.String(role)
+	roleDisplayName := titleCase(role)
 	profile := map[string]interface{}{
 		"role_name": roleDisplayName,
 		"role_id":   role,
