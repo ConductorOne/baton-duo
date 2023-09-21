@@ -7,13 +7,14 @@ Check out [Baton](https://github.com/conductorone/baton) to learn more the proje
 
 ## Prerequisites
 
-1. Duo Beyond, Duo Access, or Duo MFA plan with `Owner` role. 
+1. Duo Essentials, Duo Advantage, or Duo Premier plan with `Owner` role. 
 2. Protect an Application called `Admin API`. It can be found in `Applications` in` Duo Admin Panel`. Save your integration key, secret key, and API hostname.
 3. Grant permissions: 
   - Grant administrators
   - Grant read information
   - Grant applications
   - Grant read resource
+  - Grant write resource
 
 ## brew
 
@@ -67,14 +68,16 @@ Available Commands:
   help               Help about any command
 
 Flags:
-      --api-hostname string      Duo api hostname key needed to complete the setup to connect to the Duo API. ($BATON_API_HOSTNAME)
-  -f, --file string              The path to the c1z file to sync with ($BATON_FILE) (default "sync.c1z")
-  -h, --help                     help for baton-duo
-      --integration-key string   Duo integration key needed to complete the setup to connect to the Duo API. ($BATON_INTEGRATION_KEY)
-      --log-format string        The output format for logs: json, console ($BATON_LOG_FORMAT) (default "json")
-      --log-level string         The log level: debug, info, warn, error ($BATON_LOG_LEVEL) (default "info")
-      --secret-key string        Duo secret key needed to complete the setup to connect to the Duo API. ($BATON_SECRET_KEY)
-  -v, --version                  version for baton-duo
+      --api-hostname string           Duo api hostname key needed to complete the setup to connect to the Duo API. ($BATON_API_HOSTNAME)
+      --client-id string              The client ID used to authenticate with ConductorOne ($BATON_CLIENT_ID)
+      --client-secret string          The client secret used to authenticate with ConductorOne ($BATON_CLIENT_SECRET)
+  -f, --file string                   The path to the c1z file to sync with ($BATON_FILE) (default "sync.c1z")
+  -h, --help                          help for baton-duo
+      --integration-key string        Duo integration key needed to complete the setup to connect to the Duo API. ($BATON_INTEGRATION_KEY)
+      --log-format string             The output format for logs: json, console ($BATON_LOG_FORMAT) (default "json")
+      --log-level string              The log level: debug, info, warn, error ($BATON_LOG_LEVEL) (default "info")
+      --secret-key string             Duo secret key needed to complete the setup to connect to the Duo API. ($BATON_SECRET_KEY)
+  -v, --version                       version for baton-duo
 
 Use "baton-duo [command] --help" for more information about a command.
 

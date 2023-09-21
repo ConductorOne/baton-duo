@@ -2,12 +2,17 @@ package connector
 
 import (
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
+	"github.com/conductorone/baton-sdk/pkg/annotations"
 	"github.com/conductorone/baton-sdk/pkg/pagination"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
-var titleCaser = cases.Title(language.English)
+func titleCase(s string) string {
+	titleCaser := cases.Title(language.English)
+
+	return titleCaser.String(s)
+}
 
 func parsePageToken(i string, resourceID *v2.ResourceId) (*pagination.Bag, error) {
 	b := &pagination.Bag{}
@@ -24,4 +29,10 @@ func parsePageToken(i string, resourceID *v2.ResourceId) (*pagination.Bag, error
 	}
 
 	return b, nil
+}
+
+func annotationsForUserResourceType() annotations.Annotations {
+	annos := annotations.Annotations{}
+	annos.Update(&v2.SkipEntitlementsAndGrants{})
+	return annos
 }

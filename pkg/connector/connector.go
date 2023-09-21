@@ -19,6 +19,7 @@ var (
 		Traits: []v2.ResourceType_Trait{
 			v2.ResourceType_TRAIT_USER,
 		},
+		Annotations: annotationsForUserResourceType(),
 	}
 	resourceTypeGroup = &v2.ResourceType{
 		Id:          "group",
@@ -33,6 +34,7 @@ var (
 		Traits: []v2.ResourceType_Trait{
 			v2.ResourceType_TRAIT_USER,
 		},
+		Annotations: annotationsForUserResourceType(),
 	}
 	resourceTypeAccount = &v2.ResourceType{
 		Id:          "account",
@@ -66,6 +68,7 @@ func (d *Duo) ResourceSyncers(ctx context.Context) []connectorbuilder.ResourceSy
 func (d *Duo) Metadata(ctx context.Context) (*v2.ConnectorMetadata, error) {
 	return &v2.ConnectorMetadata{
 		DisplayName: "Duo",
+		Description: "Connector syncing users, groups, admins, accounts, and roles from Duo to Baton.",
 	}, nil
 }
 

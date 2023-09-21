@@ -8,6 +8,8 @@ import (
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
 	"github.com/conductorone/baton-sdk/pkg/annotations"
 	"github.com/conductorone/baton-sdk/pkg/pagination"
+	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
+	"go.uber.org/zap"
 
 	ent "github.com/conductorone/baton-sdk/pkg/types/entitlement"
 	grant "github.com/conductorone/baton-sdk/pkg/types/grant"
@@ -143,4 +145,47 @@ func (o *groupResourceType) Grants(ctx context.Context, resource *v2.Resource, t
 	}
 
 	return rv, pageToken, nil, nil
+}
+
+func (o *groupResourceType) Grant(ctx context.Context, principal *v2.Resource, entitlement *v2.Entitlement) (annotations.Annotations, error) {
+	l := ctxzap.Extract(ctx)
+
+	if principal.Id.ResourceType != resourceTypeUser.Id {
+		l.Warn(
+			"baton-duo: only users can be granted group membership",
+			zap.String("principal_type", principal.Id.ResourceType),
+			zap.String("principal_id", principal.Id.Resource),
+		)
+		return nil, fmt.Errorf("baton-duo: only users can be granted group membership")
+	}
+
+	err := o.client.AddUserToGroup(ctx, entitlement.Resource.Id.Resource, principal.Id.Resource)
+	if err != nil {
+		return nil, fmt.Errorf("baton-duo: error granting group membership: %w", err)
+	}
+
+	return nil, nil
+}
+
+func (o *groupResourceType) Revoke(ctx context.Context, grant *v2.Grant) (annotations.Annotations, error) {
+	l := ctxzap.Extract(ctx)
+
+	entitlement := grant.Entitlement
+	principal := grant.Principal
+
+	if principal.Id.ResourceType != resourceTypeUser.Id {
+		l.Warn(
+			"baton-duo: only users can have group membership revoked",
+			zap.String("principal_type", principal.Id.ResourceType),
+			zap.String("principal_id", principal.Id.Resource),
+		)
+		return nil, fmt.Errorf("baton-duo: only users can have group membership revoked")
+	}
+
+	err := o.client.RemoveUserFromGroup(ctx, entitlement.Resource.Id.Resource, principal.Id.Resource)
+	if err != nil {
+		return nil, fmt.Errorf("baton-duo: error revoking group membership: %w", err)
+	}
+
+	return nil, nil
 }
