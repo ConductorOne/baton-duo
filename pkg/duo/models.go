@@ -1,13 +1,16 @@
 package duo
 
 type User struct {
-	Email     string `url:"email"`
-	FirstName string `url:"firstname"`
-	LastName  string `url:"lastname"`
-	RealName  string `url:"realname"`
-	Status    string `url:"status"`
+	Email     string `json:"email"`
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
+	RealName  string `json:"realname"`
+	Status    string `json:"status"`
 	UserID    string `json:"user_id"`
-	Username  string `url:"username"`
+	Username  string `json:"username"`
+	Created   int64  `json:"created"`
+	LastLogin int64  `json:"last_login"`
+	Notes     string `json:"notes"`
 }
 
 type Group struct {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/conductorone/baton-duo/pkg/duo"
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
@@ -37,12 +38,37 @@ func userResource(ctx context.Context, user *duo.User, parentResourceID *v2.Reso
 		"last_name":  lastName,
 		"login":      user.Email,
 		"user_id":    user.UserID,
+		"username":   user.Username,
+		"notes":      user.Notes,
+	}
+
+	userStatus := v2.UserTrait_Status_STATUS_UNSPECIFIED
+
+	switch user.Status {
+	case "active":
+		userStatus = v2.UserTrait_Status_STATUS_ENABLED
+	case "bypass":
+		userStatus = v2.UserTrait_Status_STATUS_ENABLED
+	case "disabled":
+		userStatus = v2.UserTrait_Status_STATUS_DISABLED
+	case "locked out":
+		userStatus = v2.UserTrait_Status_STATUS_DISABLED
+	case "pending deletion":
+		userStatus = v2.UserTrait_Status_STATUS_DELETED
 	}
 
 	userTraitOptions := []rs.UserTraitOption{
 		rs.WithUserProfile(profile),
 		rs.WithEmail(user.Email, true),
-		rs.WithStatus(v2.UserTrait_Status_STATUS_ENABLED),
+		rs.WithStatus(userStatus),
+		rs.WithUserLogin(user.Username),
+	}
+
+	if user.Created > 0 {
+		userTraitOptions = append(userTraitOptions, rs.WithCreatedAt(time.Unix(user.Created, 0)))
+	}
+	if user.LastLogin > 0 {
+		userTraitOptions = append(userTraitOptions, rs.WithLastLogin(time.Unix(user.LastLogin, 0)))
 	}
 
 	ret, err := rs.NewUserResource(
