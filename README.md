@@ -64,20 +64,22 @@ Usage:
   baton-duo [command]
 
 Available Commands:
+  capabilities       Get connector capabilities
   completion         Generate the autocompletion script for the specified shell
   help               Help about any command
 
 Flags:
-      --api-hostname string           Duo api hostname key needed to complete the setup to connect to the Duo API. ($BATON_API_HOSTNAME)
-      --client-id string              The client ID used to authenticate with ConductorOne ($BATON_CLIENT_ID)
-      --client-secret string          The client secret used to authenticate with ConductorOne ($BATON_CLIENT_SECRET)
-  -f, --file string                   The path to the c1z file to sync with ($BATON_FILE) (default "sync.c1z")
-  -h, --help                          help for baton-duo
-      --integration-key string        Duo integration key needed to complete the setup to connect to the Duo API. ($BATON_INTEGRATION_KEY)
-      --log-format string             The output format for logs: json, console ($BATON_LOG_FORMAT) (default "json")
-      --log-level string              The log level: debug, info, warn, error ($BATON_LOG_LEVEL) (default "info")
-      --secret-key string             Duo secret key needed to complete the setup to connect to the Duo API. ($BATON_SECRET_KEY)
-  -v, --version                       version for baton-duo
+      --api-hostname string      Duo api hostname key needed to complete the setup to connect to the Duo API. ($BATON_API_HOSTNAME)
+      --client-id string         The client ID used to authenticate with ConductorOne ($BATON_CLIENT_ID)
+      --client-secret string     The client secret used to authenticate with ConductorOne ($BATON_CLIENT_SECRET)
+  -f, --file string              The path to the c1z file to sync with ($BATON_FILE) (default "sync.c1z")
+  -h, --help                     help for baton-duo
+      --integration-key string   Duo integration key needed to complete the setup to connect to the Duo API. ($BATON_INTEGRATION_KEY)
+      --log-format string        The output format for logs: json, console ($BATON_LOG_FORMAT) (default "json")
+      --log-level string         The log level: debug, info, warn, error ($BATON_LOG_LEVEL) (default "info")
+  -p, --provisioning             This must be set in order for provisioning actions to be enabled. ($BATON_PROVISIONING)
+      --secret-key string        Duo secret key needed to complete the setup to connect to the Duo API. ($BATON_SECRET_KEY)
+  -v, --version                  version for baton-duo
 
 Use "baton-duo [command] --help" for more information about a command.
 
