@@ -8,6 +8,7 @@ var (
 	IntegrationKey = field.StringField(
 		"integration-key",
 		field.WithRequired(true),
+		field.WithIsSecret(true),
 		field.WithDisplayName("Integration Key"),
 		field.WithDescription("Duo integration key needed to complete the setup to connect to the Duo API."),
 	)
@@ -23,6 +24,7 @@ var (
 	ApiHostname = field.StringField(
 		"api-hostname",
 		field.WithRequired(true),
+		field.WithIsSecret(true),
 		field.WithDisplayName("API Hostname"),
 		field.WithDescription("Duo api hostname key needed to complete the setup to connect to the Duo API."),
 	)
