@@ -6,7 +6,9 @@ toolchain go1.25.0
 
 require (
 	github.com/conductorone/baton-sdk v0.4.1
+	github.com/ennyjfrick/ruleguard-logfatal v0.0.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	go.uber.org/zap v1.27.0
 	golang.org/x/text v0.29.0
 )
