@@ -15,6 +15,7 @@ var (
 	SecretKey = field.StringField(
 		"secret-key",
 		field.WithRequired(true),
+		field.WithIsSecret(true),
 		field.WithDisplayName("Secret Key"),
 		field.WithDescription("Duo secret key needed to complete the setup to connect to the Duo API."),
 	)
