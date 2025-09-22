@@ -13,6 +13,9 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -100,6 +103,46 @@ type IntegrationResponse struct {
 	} `json:"response"`
 }
 
+func duoToGRPCErrorCode(duoCode int64) codes.Code {
+	// Extract the first 3 digits from the left, Duo sends a 5 digit code for errors
+	httpCode := duoCode
+	for httpCode >= 1000 {
+		httpCode /= 10
+	}
+	switch httpCode {
+	case http.StatusBadRequest:
+		return codes.InvalidArgument
+	case http.StatusTooManyRequests, http.StatusServiceUnavailable:
+		return codes.Unavailable
+	case http.StatusUnauthorized:
+		return codes.Unauthenticated
+	case http.StatusForbidden:
+		return codes.PermissionDenied
+	case http.StatusNotFound:
+		return codes.NotFound
+	case http.StatusNotImplemented:
+		return codes.Unimplemented
+	case http.StatusInternalServerError:
+		return codes.Internal
+	}
+
+	if httpCode >= 500 && httpCode <= 599 {
+		return codes.Unavailable
+	}
+
+	if httpCode < 200 || httpCode >= 300 {
+		return codes.Unknown
+	}
+
+	return codes.Unknown
+}
+
+func wrapError(errResp ErrorResponse, message string) error {
+	grpcErrorCode := duoToGRPCErrorCode(errResp.Code)
+	status := status.New(grpcErrorCode, errResp.Message)
+	return fmt.Errorf("duo-connector: %s: %s", message, status.Err())
+}
+
 // returns query params with pagination options.
 func paginationQuery(offset string) url.Values {
 	q := url.Values{}
@@ -178,7 +221,7 @@ func (c *Client) GetUsers(ctx context.Context, offset string) ([]User, string, e
 	}
 
 	if res.Stat == requestFailedStat {
-		return nil, "", fmt.Errorf("error fetching users: %s", res.Message)
+		return nil, "", wrapError(res.ErrorResponse, "error fetching users")
 	}
 
 	if (res.Metadata != ListResultMetadata{}) {
@@ -206,7 +249,7 @@ func (c *Client) GetGroups(ctx context.Context, offset string) ([]Group, string,
 	}
 
 	if res.Stat == requestFailedStat {
-		return nil, "", fmt.Errorf("error fetching groups: %s", res.Message)
+		return nil, "", wrapError(res.ErrorResponse, "error fetching groups")
 	}
 
 	if (res.Metadata != ListResultMetadata{}) {
@@ -234,7 +277,7 @@ func (c *Client) GetGroupUsers(ctx context.Context, groupId string, offset strin
 	}
 
 	if res.Stat == requestFailedStat {
-		return nil, "", fmt.Errorf("error fetching group users: %s", res.Message)
+		return nil, "", wrapError(res.ErrorResponse, "error fetching group users")
 	}
 
 	if (res.Metadata != ListResultMetadata{}) {
@@ -262,7 +305,7 @@ func (c *Client) GetAdmins(ctx context.Context, offset string) ([]Admin, string,
 	}
 
 	if res.Stat == requestFailedStat {
-		return nil, "", fmt.Errorf("error fetching admins: %s", res.Message)
+		return nil, "", wrapError(res.ErrorResponse, "error fetching admins")
 	}
 
 	if (res.Metadata != ListResultMetadata{}) {
@@ -287,7 +330,7 @@ func (c *Client) GetUser(ctx context.Context, userId string) (User, error) {
 	}
 
 	if res.Stat == requestFailedStat {
-		return User{}, fmt.Errorf("error fetching a user: %s", res.Message)
+		return User{}, wrapError(res.ErrorResponse, "error fetching a user")
 	}
 
 	return res.Response, nil
@@ -308,7 +351,7 @@ func (c *Client) GetIntegration(ctx context.Context) (IntegrationResponse, error
 	}
 
 	if res.Stat == requestFailedStat {
-		return IntegrationResponse{}, fmt.Errorf("error fetching integration: %s", res.Message)
+		return IntegrationResponse{}, wrapError(res.ErrorResponse, "error fetching integration")
 	}
 
 	return res, nil
@@ -329,7 +372,7 @@ func (c *Client) GetAccount(ctx context.Context) (Account, error) {
 	}
 
 	if res.Stat == requestFailedStat {
-		return Account{}, fmt.Errorf("error fetching account: %s", res.Message)
+		return Account{}, wrapError(res.ErrorResponse, "error fetching account")
 	}
 
 	return res.Response, nil
@@ -357,7 +400,7 @@ func (c *Client) AddUserToGroup(ctx context.Context, groupId, userId string) err
 	}
 
 	if res.Stat == requestFailedStat {
-		return fmt.Errorf("error adding user to group: %s", res.Message)
+		return wrapError(res.ErrorResponse, "error adding user to group")
 	}
 
 	return nil
@@ -382,7 +425,7 @@ func (c *Client) RemoveUserFromGroup(ctx context.Context, groupId, userId string
 	}
 
 	if res.Stat == requestFailedStat {
-		return fmt.Errorf("error removing user from group: %s", res.Message)
+		return wrapError(res.ErrorResponse, "error removing user from group")
 	}
 
 	return nil
