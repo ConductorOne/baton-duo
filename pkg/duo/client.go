@@ -140,7 +140,7 @@ func duoToGRPCErrorCode(duoCode int64) codes.Code {
 func wrapError(errResp ErrorResponse, message string) error {
 	grpcErrorCode := duoToGRPCErrorCode(errResp.Code)
 	status := status.New(grpcErrorCode, errResp.Message)
-	return fmt.Errorf("duo-connector: %s: %s", message, status.Err())
+	return fmt.Errorf("duo-connector: %s: %w", message, status.Err())
 }
 
 // returns query params with pagination options.
