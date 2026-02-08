@@ -29,10 +29,16 @@ var (
 		field.WithDescription("Duo api hostname key needed to complete the setup to connect to the Duo API."),
 	)
 
+	BaseURLField = field.StringField(
+		"base-url",
+		field.WithDescription("Override the Duo API URL (for testing)"),
+	)
+
 	ConfigurationFields = []field.SchemaField{
 		IntegrationKey,
 		SecretKey,
 		ApiHostname,
+		BaseURLField,
 	}
 )
 

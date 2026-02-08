@@ -33,12 +33,15 @@ type Client struct {
 	host           string
 }
 
-func NewClient(integrationKey string, secretKey string, apiHostname string, httpClient *http.Client) *Client {
-	baseUrl := fmt.Sprintf("https://%s", apiHostname)
+func NewClient(integrationKey string, secretKey string, apiHostname string, baseURL string, httpClient *http.Client) *Client {
+	effectiveBaseURL := baseURL
+	if effectiveBaseURL == "" {
+		effectiveBaseURL = fmt.Sprintf("https://%s", apiHostname)
+	}
 	return &Client{
 		integrationKey: integrationKey,
 		secretKey:      secretKey,
-		baseUrl:        baseUrl,
+		baseUrl:        effectiveBaseURL,
 		host:           apiHostname,
 		wrapper:        uhttp.NewBaseHttpClient(httpClient),
 	}
