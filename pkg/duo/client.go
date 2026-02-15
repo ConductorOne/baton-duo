@@ -35,14 +35,17 @@ type Client struct {
 
 func NewClient(integrationKey string, secretKey string, apiHostname string, baseURL string, httpClient *http.Client) *Client {
 	effectiveBaseURL := baseURL
+	effectiveHost := apiHostname
 	if effectiveBaseURL == "" {
 		effectiveBaseURL = fmt.Sprintf("https://%s", apiHostname)
+	} else if u, err := url.Parse(effectiveBaseURL); err == nil && u.Host != "" {
+		effectiveHost = u.Host
 	}
 	return &Client{
 		integrationKey: integrationKey,
 		secretKey:      secretKey,
 		baseUrl:        effectiveBaseURL,
-		host:           apiHostname,
+		host:           effectiveHost,
 		wrapper:        uhttp.NewBaseHttpClient(httpClient),
 	}
 }
