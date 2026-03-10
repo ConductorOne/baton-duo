@@ -94,14 +94,6 @@ type AccountResponse struct {
 	Response Account `json:"response"`
 }
 
-type IntegrationResponse struct {
-	ErrorResponse
-	Stat     string `json:"stat"`
-	Response struct {
-		Name           string `json:"name"`
-		IntegrationKey string `json:"integration_key"`
-	} `json:"response"`
-}
 
 func duoToGRPCErrorCode(duoCode int64) codes.Code {
 	// Extract the first 3 digits from the left, Duo sends a 5 digit code for errors
@@ -336,26 +328,6 @@ func (c *Client) GetUser(ctx context.Context, userId string) (User, error) {
 	return res.Response, nil
 }
 
-// GetIntegration returns an integration by integration key.
-func (c *Client) GetIntegration(ctx context.Context) (IntegrationResponse, error) {
-	uri := fmt.Sprintf("/admin/v1/integrations/%s", c.integrationKey)
-	adminsUrl := fmt.Sprint(c.baseUrl, uri)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, adminsUrl, nil)
-	if err != nil {
-		return IntegrationResponse{}, err
-	}
-
-	var res IntegrationResponse
-	if err := c.doRequest(uri, req, &res, nil); err != nil {
-		return IntegrationResponse{}, err
-	}
-
-	if res.Stat == requestFailedStat {
-		return IntegrationResponse{}, wrapError(res.ErrorResponse, "error fetching integration")
-	}
-
-	return res, nil
-}
 
 // GetAccount returns account info.
 func (c *Client) GetAccount(ctx context.Context) (Account, error) {
@@ -442,6 +414,7 @@ func (c *Client) doRequest(uri string, req *http.Request, resType interface{}, p
 	req.Header.Add("Date", now)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
+	// #nosec G704 -- URL is config baseUrl + fixed path pattern, not user-controlled
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
