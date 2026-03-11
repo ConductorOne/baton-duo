@@ -73,10 +73,11 @@ func (d *Duo) Metadata(ctx context.Context) (*v2.ConnectorMetadata, error) {
 }
 
 // Validate hits the Duo API to validate API credentials.
+// Uses GET /admin/v1/settings which only requires "Grant settings" (read-only).
 func (d *Duo) Validate(ctx context.Context) (annotations.Annotations, error) {
-	_, err := d.client.GetIntegration(ctx)
+	_, err := d.client.GetAccount(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching integration by credentials: %w", err)
+		return nil, fmt.Errorf("baton-duo: error fetching account by credentials: %w", err)
 	}
 	return nil, nil
 }
