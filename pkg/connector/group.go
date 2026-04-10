@@ -131,11 +131,9 @@ func (o *groupResourceType) Grants(ctx context.Context, resource *v2.Resource, t
 	var rv []*v2.Grant
 	for _, user := range users {
 		userCopy := user
-		user, err := o.client.GetUser(ctx, userCopy.UserID)
-		if err != nil {
-			return nil, "", nil, err
-		}
-		ur, err := userResource(ctx, &user, resource.Id)
+		// Use user data from GetGroupUsers directly — it returns full User objects,
+		// so the per-user GetUser re-fetch was an unnecessary N+1 query.
+		ur, err := userResource(ctx, &userCopy, resource.Id)
 		if err != nil {
 			return nil, "", nil, err
 		}
