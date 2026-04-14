@@ -94,6 +94,11 @@ type AccountResponse struct {
 	Response Account `json:"response"`
 }
 
+type RolesResponse struct {
+	ErrorResponse
+	Stat     string `json:"stat"`
+	Response []Role `json:"response"`
+}
 
 func duoToGRPCErrorCode(duoCode int64) codes.Code {
 	// Extract the first 3 digits from the left, Duo sends a 5 digit code for errors
@@ -328,7 +333,6 @@ func (c *Client) GetUser(ctx context.Context, userId string) (User, error) {
 	return res.Response, nil
 }
 
-
 // GetAccount returns account info.
 func (c *Client) GetAccount(ctx context.Context) (Account, error) {
 	uri := "/admin/v1/settings"
@@ -345,6 +349,30 @@ func (c *Client) GetAccount(ctx context.Context) (Account, error) {
 
 	if res.Stat == requestFailedStat {
 		return Account{}, wrapError(res.ErrorResponse, "error fetching account")
+	}
+
+	return res.Response, nil
+}
+
+// GetRoles returns all admin roles.
+func (c *Client) GetRoles(ctx context.Context) ([]Role, error) {
+	uri := "/admin/v1/admin_roles"
+	rolesUrl, err := url.JoinPath(c.baseUrl, uri)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rolesUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var res RolesResponse
+	if err := c.doRequest(uri, req, &res, nil); err != nil {
+		return nil, err
+	}
+
+	if res.Stat == requestFailedStat {
+		return nil, wrapError(res.ErrorResponse, "error fetching roles")
 	}
 
 	return res.Response, nil
