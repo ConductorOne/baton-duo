@@ -25,9 +25,18 @@ type Admin struct {
 	Email   string `json:"email"`
 	Name    string `json:"name"`
 	Role    string `json:"role"`
+	RoleID  string `json:"role_id"`
 	Status  string `json:"status"`
 }
 
 type Account struct {
 	Name string `json:"name"`
+}
+
+type Role struct {
+	RoleID      string `json:"role_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	InUse       bool   `json:"in_use"`
+	IsCustom    bool   `json:"is_custom"`
 }
