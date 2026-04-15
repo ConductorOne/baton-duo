@@ -73,7 +73,7 @@ func (o *roleResourceType) List(ctx context.Context, parentId *v2.ResourceId, to
 		return nil, "", nil, nil
 	}
 
-	roles, err := o.client.GetRoles(ctx)
+	roles, rl, err := o.client.GetRoles(ctx)
 	if err != nil {
 		return nil, "", nil, err
 	}
@@ -87,7 +87,7 @@ func (o *roleResourceType) List(ctx context.Context, parentId *v2.ResourceId, to
 		rv = append(rv, rr)
 	}
 
-	return rv, "", nil, nil
+	return rv, "", annotations.New(rl), nil
 }
 
 func (o *roleResourceType) Entitlements(_ context.Context, resource *v2.Resource, _ *pagination.Token) ([]*v2.Entitlement, string, annotations.Annotations, error) {
@@ -125,8 +125,7 @@ func (o *roleResourceType) Grants(ctx context.Context, resource *v2.Resource, to
 	var rv []*v2.Grant
 	for _, admin := range admins {
 		if resource.Id.Resource == admin.RoleID {
-			adminCopy := admin
-			ar, err := adminResource(ctx, &adminCopy, resource.Id)
+			ar, err := adminResource(ctx, &admin, resource.Id)
 			if err != nil {
 				return nil, "", nil, err
 			}

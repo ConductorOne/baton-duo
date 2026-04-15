@@ -14,6 +14,8 @@ import (
 	"strings"
 	"time"
 
+	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
+	"github.com/conductorone/baton-sdk/pkg/uhttp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -24,7 +26,7 @@ const (
 )
 
 type Client struct {
-	httpClient     *http.Client
+	wrapper        *uhttp.BaseHttpClient
 	integrationKey string
 	secretKey      string
 	baseUrl        string
@@ -38,7 +40,7 @@ func NewClient(integrationKey string, secretKey string, apiHostname string, http
 		secretKey:      secretKey,
 		baseUrl:        baseUrl,
 		host:           apiHostname,
-		httpClient:     httpClient,
+		wrapper:        uhttp.NewBaseHttpClient(httpClient),
 	}
 }
 
@@ -354,28 +356,29 @@ func (c *Client) GetAccount(ctx context.Context) (Account, error) {
 	return res.Response, nil
 }
 
-// GetRoles returns all admin roles.
-func (c *Client) GetRoles(ctx context.Context) ([]Role, error) {
+// GetRoles returns all admin roles along with rate limit data from the response headers.
+func (c *Client) GetRoles(ctx context.Context) ([]Role, *v2.RateLimitDescription, error) {
 	uri := "/admin/v1/admin_roles"
 	rolesUrl, err := url.JoinPath(c.baseUrl, uri)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rolesUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var res RolesResponse
-	if err := c.doRequest(uri, req, &res, nil); err != nil {
-		return nil, err
+	rl, err := c.do(uri, req, &res, nil)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	if res.Stat == requestFailedStat {
-		return nil, wrapError(res.ErrorResponse, "error fetching roles")
+		return nil, rl, wrapError(res.ErrorResponse, "error fetching roles")
 	}
 
-	return res.Response, nil
+	return res.Response, rl, nil
 }
 
 // AddUserToGroup adds a user to a group.
@@ -431,27 +434,37 @@ func (c *Client) RemoveUserFromGroup(ctx context.Context, groupId, userId string
 	return nil
 }
 
-func (c *Client) doRequest(uri string, req *http.Request, resType interface{}, params url.Values) error {
+// do executes the request, decodes the JSON response body into resType, and returns
+// any rate limit information parsed from the response headers.
+func (c *Client) do(uri string, req *http.Request, resType interface{}, params url.Values) (*v2.RateLimitDescription, error) {
 	now := time.Now().UTC().Format(time.RFC1123Z)
 	signature, err := sign(c.integrationKey, c.secretKey, req.Method, c.host, uri, now, params)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	req.Header.Add("Authorization", signature)
 	req.Header.Add("Date", now)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
+	var rl v2.RateLimitDescription
 	// #nosec G704 -- URL is config baseUrl + fixed path pattern, not user-controlled
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.wrapper.Do(req,
+		uhttp.WithJSONResponse(resType),
+		uhttp.WithRatelimitData(&rl),
+	)
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if err := json.NewDecoder(resp.Body).Decode(&resType); err != nil {
-		return err
+		return &rl, err
 	}
 
-	return nil
+	return &rl, nil
+}
+
+// doRequest executes the request and decodes the response, discarding rate limit data.
+func (c *Client) doRequest(uri string, req *http.Request, resType interface{}, params url.Values) error {
+	_, err := c.do(uri, req, resType, params)
+	return err
 }
