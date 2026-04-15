@@ -13,6 +13,14 @@ import (
 	rs "github.com/conductorone/baton-sdk/pkg/types/resource"
 )
 
+const (
+	duoStatusActive          = "active"
+	duoStatusBypass          = "bypass"
+	duoStatusDisabled        = "disabled"
+	duoStatusLockedOut       = "locked out"
+	duoStatusPendingDeletion = "pending deletion"
+)
+
 type userResourceType struct {
 	resourceType *v2.ResourceType
 	client       *duo.Client
@@ -47,17 +55,17 @@ func userResource(ctx context.Context, user *duo.User, parentResourceID *v2.Reso
 	statusDetails := ""
 
 	switch user.Status {
-	case "active":
+	case duoStatusActive:
 		userStatus = v2.UserTrait_Status_STATUS_ENABLED
-	case "bypass":
+	case duoStatusBypass:
 		userStatus = v2.UserTrait_Status_STATUS_ENABLED
-		statusDetails = "bypass"
-	case "disabled":
+		statusDetails = duoStatusBypass
+	case duoStatusDisabled:
 		userStatus = v2.UserTrait_Status_STATUS_DISABLED
-	case "locked out":
+	case duoStatusLockedOut:
 		userStatus = v2.UserTrait_Status_STATUS_DISABLED
-		statusDetails = "locked out"
-	case "pending deletion":
+		statusDetails = duoStatusLockedOut
+	case duoStatusPendingDeletion:
 		userStatus = v2.UserTrait_Status_STATUS_DELETED
 	}
 
@@ -68,7 +76,7 @@ func userResource(ctx context.Context, user *duo.User, parentResourceID *v2.Reso
 		rs.WithUserLogin(user.Username),
 	}
 
-	if user.Status == "bypass" {
+	if user.Status == duoStatusBypass {
 		userTraitOptions = append(userTraitOptions,
 			rs.WithMFAStatus(v2.UserTrait_MFAStatus_builder{MfaEnabled: false}.Build()),
 		)
