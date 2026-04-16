@@ -50,14 +50,16 @@ func roleResource(_ context.Context, role duo.Role, parentResourceID *v2.Resourc
 	resourceOpts := []resource.ResourceOption{
 		resource.WithParentResourceID(parentResourceID),
 	}
+	legacyCompatibleResourceID := role.RoleID
 	if legacy, ok := legacyRoleID[role.RoleID]; ok {
-		resourceOpts = append(resourceOpts, resource.WithAliases(legacy))
+		// TODO: Use withAliases to migrate to proper IDs once the feature is fully supported.
+		legacyCompatibleResourceID = legacy
 	}
 
 	ret, err := resource.NewRoleResource(
 		role.Name,
 		resourceTypeRole,
-		role.RoleID,
+		legacyCompatibleResourceID,
 		roleTraitOptions,
 		resourceOpts...,
 	)
@@ -124,7 +126,12 @@ func (o *roleResourceType) Grants(ctx context.Context, resource *v2.Resource, to
 
 	var rv []*v2.Grant
 	for _, admin := range admins {
-		if resource.Id.Resource == admin.RoleID {
+		legacyCompatibleAdminID := admin.RoleID
+		if legacy, ok := legacyRoleID[admin.RoleID]; ok {
+			// TODO: Use withAliases to migrate to proper IDs once the feature is fully supported.
+			legacyCompatibleAdminID = legacy
+		}
+		if resource.Id.Resource == legacyCompatibleAdminID {
 			ar, err := adminResource(ctx, &admin, resource.Id)
 			if err != nil {
 				return nil, "", nil, err
