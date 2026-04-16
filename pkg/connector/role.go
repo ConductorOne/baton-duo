@@ -126,7 +126,12 @@ func (o *roleResourceType) Grants(ctx context.Context, resource *v2.Resource, to
 
 	var rv []*v2.Grant
 	for _, admin := range admins {
-		if resource.Id.Resource == admin.RoleID {
+		legacyCompatibleAdminID := admin.RoleID
+		if legacy, ok := legacyRoleID[admin.RoleID]; ok {
+			// TODO: Use withAliases to migrate to proper IDs once the feature is fully supported.
+			legacyCompatibleAdminID = legacy
+		}
+		if resource.Id.Resource == legacyCompatibleAdminID {
 			ar, err := adminResource(ctx, &admin, resource.Id)
 			if err != nil {
 				return nil, "", nil, err
