@@ -50,14 +50,16 @@ func roleResource(_ context.Context, role duo.Role, parentResourceID *v2.Resourc
 	resourceOpts := []resource.ResourceOption{
 		resource.WithParentResourceID(parentResourceID),
 	}
+	legacyCompatibleResourceID := role.RoleID
 	if legacy, ok := legacyRoleID[role.RoleID]; ok {
-		resourceOpts = append(resourceOpts, resource.WithAliases(legacy))
+		// TODO: Use withAliases to migrate to proper IDs once the feature is fully supported.
+		legacyCompatibleResourceID = legacy
 	}
 
 	ret, err := resource.NewRoleResource(
 		role.Name,
 		resourceTypeRole,
-		role.RoleID,
+		legacyCompatibleResourceID,
 		roleTraitOptions,
 		resourceOpts...,
 	)
