@@ -14,9 +14,15 @@ This connector uses the Duo Admin API, which is available to users on the Duo Pr
 
 | Resource | Sync | Provision |
 | :--- | :--- | :--- |
+| Users | <Icon icon="square-check" iconType="solid"  color="#c937ae"/> | |
+| Admins | <Icon icon="square-check" iconType="solid"  color="#c937ae"/> | |
 | Accounts | <Icon icon="square-check" iconType="solid"  color="#c937ae"/> | |
 | Roles | <Icon icon="square-check" iconType="solid"  color="#c937ae"/> | |
 | Groups | <Icon icon="square-check" iconType="solid"  color="#c937ae"/> | <Icon icon="square-check" iconType="solid"  color="#c937ae"/> |
+
+<Note>
+Roles are sourced dynamically from the Duo Admin API, including built-in roles (Owner, Administrator, Application Manager, User Manager, Help Desk, Billing, Read-only, Security Analyst) and any custom admin roles configured in your Duo account. Custom roles are a beta feature in Duo.
+</Note>
 
 ## Gather Duo credentials
 
@@ -170,6 +176,9 @@ stringData:
   BATON_API_HOSTNAME: <Duo API hostname>
   BATON_INTEGRATION_KEY: <Duo integration key>
   BATON_SECRET_KEY: <Duo secret key>
+  
+  # Optional: enable group membership provisioning
+  # BATON_PROVISIONING: "true"
 ```
 
 See the connector's README or run `--help` to see all available configuration flags and environment variables.
