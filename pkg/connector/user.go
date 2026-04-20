@@ -13,6 +13,14 @@ import (
 	rs "github.com/conductorone/baton-sdk/pkg/types/resource"
 )
 
+const (
+	duoStatusActive          = "active"
+	duoStatusBypass          = "bypass"
+	duoStatusDisabled        = "disabled"
+	duoStatusLockedOut       = "locked out"
+	duoStatusPendingDeletion = "pending deletion"
+)
+
 type userResourceType struct {
 	resourceType *v2.ResourceType
 	client       *duo.Client
@@ -34,34 +42,44 @@ func userResource(ctx context.Context, user *duo.User, parentResourceID *v2.Reso
 		lastName = names[1]
 	}
 	profile := map[string]interface{}{
-		"first_name": firstName,
-		"last_name":  lastName,
-		"login":      user.Email,
-		"user_id":    user.UserID,
-		"username":   user.Username,
-		"notes":      user.Notes,
+		"first_name":  firstName,
+		"last_name":   lastName,
+		"login":       user.Email,
+		"user_id":     user.UserID,
+		"username":    user.Username,
+		"notes":       user.Notes,
+		"duo_status":  user.Status,
 	}
 
 	userStatus := v2.UserTrait_Status_STATUS_UNSPECIFIED
+	statusDetails := ""
 
 	switch user.Status {
-	case "active":
+	case duoStatusActive:
 		userStatus = v2.UserTrait_Status_STATUS_ENABLED
-	case "bypass":
+	case duoStatusBypass:
 		userStatus = v2.UserTrait_Status_STATUS_ENABLED
-	case "disabled":
+		statusDetails = duoStatusBypass
+	case duoStatusDisabled:
 		userStatus = v2.UserTrait_Status_STATUS_DISABLED
-	case "locked out":
+	case duoStatusLockedOut:
 		userStatus = v2.UserTrait_Status_STATUS_DISABLED
-	case "pending deletion":
+		statusDetails = duoStatusLockedOut
+	case duoStatusPendingDeletion:
 		userStatus = v2.UserTrait_Status_STATUS_DELETED
 	}
 
 	userTraitOptions := []rs.UserTraitOption{
 		rs.WithUserProfile(profile),
 		rs.WithEmail(user.Email, true),
-		rs.WithStatus(userStatus),
+		rs.WithDetailedStatus(userStatus, statusDetails),
 		rs.WithUserLogin(user.Username),
+	}
+
+	if user.Status == duoStatusBypass {
+		userTraitOptions = append(userTraitOptions,
+			rs.WithMFAStatus(v2.UserTrait_MFAStatus_builder{MfaEnabled: false}.Build()),
+		)
 	}
 
 	if user.Created > 0 {
