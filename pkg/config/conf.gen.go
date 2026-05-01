@@ -7,9 +7,10 @@ type Duo struct {
 	IntegrationKey string `mapstructure:"integration-key"`
 	SecretKey string `mapstructure:"secret-key"`
 	ApiHostname string `mapstructure:"api-hostname"`
+	BaseUrl string `mapstructure:"base-url"`
 }
 
-func (c* Duo) findFieldByTag(tagValue string) (any, bool) {
+func (c *Duo) findFieldByTag(tagValue string) (any, bool) {
 	v := reflect.ValueOf(c).Elem() // Dereference pointer to struct
 	t := v.Type()
 
@@ -41,11 +42,13 @@ func (c *Duo) GetString(fieldName string) string {
 	if !ok {
 		return ""
 	}
-	t, ok := v.(string)
-	if !ok {
-		panic("wrong type")
+	if t, ok := v.(string); ok {
+		return t
 	}
-	return t
+	if t, ok := v.([]byte); ok {
+		return string(t)
+	}
+	panic("wrong type")
 }
 
 func (c *Duo) GetInt(fieldName string) int {

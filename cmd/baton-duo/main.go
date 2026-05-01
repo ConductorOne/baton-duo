@@ -47,7 +47,7 @@ func getConnector(ctx context.Context, duoCfg *cfg.Duo) (types.ConnectorServer, 
 		return nil, err
 	}
 
-	cb, err := connector.New(ctx, duoCfg.IntegrationKey, duoCfg.SecretKey, duoCfg.ApiHostname)
+	cb, err := connector.New(ctx, duoCfg.IntegrationKey, duoCfg.SecretKey, duoCfg.ApiHostname, duoCfg.BaseUrl)
 	if err != nil {
 		l.Error("error creating connector", zap.Error(err))
 		return nil, err

@@ -83,14 +83,14 @@ func (d *Duo) Validate(ctx context.Context) (annotations.Annotations, error) {
 }
 
 // New returns the Duo connector.
-func New(ctx context.Context, integrationKey string, secretKey string, apiHostname string) (*Duo, error) {
+func New(ctx context.Context, integrationKey string, secretKey string, apiHostname string, baseURL string) (*Duo, error) {
 	httpClient, err := uhttp.NewClient(ctx, uhttp.WithLogger(true, ctxzap.Extract(ctx)))
 	if err != nil {
 		return nil, err
 	}
 
 	return &Duo{
-		client:         duo.NewClient(integrationKey, secretKey, apiHostname, httpClient),
+		client:         duo.NewClient(integrationKey, secretKey, apiHostname, baseURL, httpClient),
 		integrationKey: integrationKey,
 	}, nil
 }
