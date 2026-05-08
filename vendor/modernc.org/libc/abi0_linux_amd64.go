@@ -2,7 +2,6 @@
 
 package libc
 
-
 import "unsafe"
 
 var _ unsafe.Pointer
@@ -470,6 +469,9 @@ func Y__builtin_popcount(t *TLS, x uint32) (_2 int32)
 func Y__builtin_popcountl(t *TLS, x ulong) (_2 int32)
 
 //go:noescape
+func Y__builtin_popcountll(t *TLS, x uint64) (_2 int32)
+
+//go:noescape
 func Y__builtin_prefetch(t *TLS, addr, args uintptr)
 
 //go:noescape
@@ -813,7 +815,7 @@ func __ccgo_abi0___dns_parse_2(_0 *TLS, _1 uintptr, _2 int32, _3 uintptr, _4 int
 
 func __ccgo_abiInternal___dns_parse_2(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 int32, _3 uintptr, _4 int32, _5 uintptr, _6 int32) (_7 int32) {
-		 return __ccgo_abi0___dns_parse_2(_0, _1, _2, _3, _4, _5, _6, abi0CodePtr)
+		return __ccgo_abi0___dns_parse_2(_0, _1, _2, _3, _4, _5, _6, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -1297,7 +1299,7 @@ func __ccgo_abi0___qsort_r_3(_0 *TLS, _1 uintptr, _2 uintptr, _3 uintptr, __ccgo
 
 func __ccgo_abiInternal___qsort_r_3(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr, _3 uintptr) (_4 int32) {
-		 return __ccgo_abi0___qsort_r_3(_0, _1, _2, _3, abi0CodePtr)
+		return __ccgo_abi0___qsort_r_3(_0, _1, _2, _3, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -1352,7 +1354,7 @@ func __ccgo_abi0___rtnetlink_enumerate_2(_0 *TLS, _1 uintptr, _2 uintptr, __ccgo
 
 func __ccgo_abiInternal___rtnetlink_enumerate_2(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr) (_3 int32) {
-		 return __ccgo_abi0___rtnetlink_enumerate_2(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0___rtnetlink_enumerate_2(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -1749,7 +1751,7 @@ func __ccgo_abi0_at_quick_exit_0(_0 *TLS, __ccgo_fp uintptr)
 
 func __ccgo_abiInternal_at_quick_exit_0(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS) {
-		 __ccgo_abi0_at_quick_exit_0(_0, abi0CodePtr)
+		__ccgo_abi0_at_quick_exit_0(_0, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -1831,7 +1833,7 @@ func __ccgo_abi0_bsearch_4(_0 *TLS, _1 uintptr, _2 uintptr, __ccgo_fp uintptr) (
 
 func __ccgo_abiInternal_bsearch_4(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr) (_3 int32) {
-		 return __ccgo_abi0_bsearch_4(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0_bsearch_4(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -2843,7 +2845,7 @@ func __ccgo_abi0_ftw_1(_0 *TLS, _1 uintptr, _2 uintptr, _3 int32, __ccgo_fp uint
 
 func __ccgo_abiInternal_ftw_1(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr, _3 int32) (_4 int32) {
-		 return __ccgo_abi0_ftw_1(_0, _1, _2, _3, abi0CodePtr)
+		return __ccgo_abi0_ftw_1(_0, _1, _2, _3, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -3189,7 +3191,7 @@ func __ccgo_abi0_glob_2(_0 *TLS, _1 uintptr, _2 int32, __ccgo_fp uintptr) (_3 in
 
 func __ccgo_abiInternal_glob_2(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 int32) (_3 int32) {
-		 return __ccgo_abi0_glob_2(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0_glob_2(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -3577,7 +3579,7 @@ func __ccgo_abi0_lfind_4(_0 *TLS, _1 uintptr, _2 uintptr, __ccgo_fp uintptr) (_3
 
 func __ccgo_abiInternal_lfind_4(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr) (_3 int32) {
-		 return __ccgo_abi0_lfind_4(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0_lfind_4(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -3737,7 +3739,7 @@ func __ccgo_abi0_lsearch_4(_0 *TLS, _1 uintptr, _2 uintptr, __ccgo_fp uintptr) (
 
 func __ccgo_abiInternal_lsearch_4(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr) (_3 int32) {
-		 return __ccgo_abi0_lsearch_4(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0_lsearch_4(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -3981,7 +3983,7 @@ func __ccgo_abi0_nftw_1(_0 *TLS, _1 uintptr, _2 uintptr, _3 int32, _4 uintptr, _
 
 func __ccgo_abiInternal_nftw_1(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr, _3 int32, _4 uintptr) (_5 int32) {
-		 return __ccgo_abi0_nftw_1(_0, _1, _2, _3, _4, abi0CodePtr)
+		return __ccgo_abi0_nftw_1(_0, _1, _2, _3, _4, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -4405,7 +4407,7 @@ func __ccgo_abi0_qsort_3(_0 *TLS, _1 uintptr, _2 uintptr, __ccgo_fp uintptr) (_3
 
 func __ccgo_abiInternal_qsort_3(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr) (_3 int32) {
-		 return __ccgo_abi0_qsort_3(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0_qsort_3(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -4418,7 +4420,7 @@ func __ccgo_abi0_qsort_r_3(_0 *TLS, _1 uintptr, _2 uintptr, _3 uintptr, __ccgo_f
 
 func __ccgo_abiInternal_qsort_r_3(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr, _3 uintptr) (_4 int32) {
-		 return __ccgo_abi0_qsort_r_3(_0, _1, _2, _3, abi0CodePtr)
+		return __ccgo_abi0_qsort_r_3(_0, _1, _2, _3, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -4617,7 +4619,7 @@ func __ccgo_abi0_scandir_2(_0 *TLS, _1 uintptr, __ccgo_fp uintptr) (_2 int32)
 
 func __ccgo_abiInternal_scandir_2(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr) (_2 int32) {
-		 return __ccgo_abi0_scandir_2(_0, _1, abi0CodePtr)
+		return __ccgo_abi0_scandir_2(_0, _1, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -4627,7 +4629,7 @@ func __ccgo_abi0_scandir_3(_0 *TLS, _1 uintptr, _2 uintptr, __ccgo_fp uintptr) (
 
 func __ccgo_abiInternal_scandir_3(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr) (_3 int32) {
-		 return __ccgo_abi0_scandir_3(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0_scandir_3(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -5029,7 +5031,7 @@ func Ystrlcat(tls *TLS, d uintptr, s uintptr, n Tsize_t) (r Tsize_t)
 func Ystrlcpy(tls *TLS, d uintptr, s uintptr, n Tsize_t) (r Tsize_t)
 
 //go:noescape
-func Ystrlen(tls *TLS, s uintptr) (r Tsize_t)
+func Ystrlen(t *TLS, s uintptr) (r Tsize_t)
 
 //go:noescape
 func Ystrncasecmp(tls *TLS, _l uintptr, _r uintptr, n Tsize_t) (r1 int32)
@@ -5231,7 +5233,7 @@ func __ccgo_abi0_tdelete_2(_0 *TLS, _1 uintptr, _2 uintptr, __ccgo_fp uintptr) (
 
 func __ccgo_abiInternal_tdelete_2(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr) (_3 int32) {
-		 return __ccgo_abi0_tdelete_2(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0_tdelete_2(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -5244,7 +5246,7 @@ func __ccgo_abi0_tdestroy_1(_0 *TLS, _1 uintptr, __ccgo_fp uintptr)
 
 func __ccgo_abiInternal_tdestroy_1(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr) {
-		 __ccgo_abi0_tdestroy_1(_0, _1, abi0CodePtr)
+		__ccgo_abi0_tdestroy_1(_0, _1, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -5269,7 +5271,7 @@ func __ccgo_abi0_tfind_2(_0 *TLS, _1 uintptr, _2 uintptr, __ccgo_fp uintptr) (_3
 
 func __ccgo_abiInternal_tfind_2(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr) (_3 int32) {
-		 return __ccgo_abi0_tfind_2(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0_tfind_2(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -5375,7 +5377,7 @@ func __ccgo_abi0_tsearch_2(_0 *TLS, _1 uintptr, _2 uintptr, __ccgo_fp uintptr) (
 
 func __ccgo_abiInternal_tsearch_2(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 uintptr) (_3 int32) {
-		 return __ccgo_abi0_tsearch_2(_0, _1, _2, abi0CodePtr)
+		return __ccgo_abi0_tsearch_2(_0, _1, _2, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
@@ -5394,7 +5396,7 @@ func __ccgo_abi0_twalk_1(_0 *TLS, _1 uintptr, _2 int32, _3 int32, __ccgo_fp uint
 
 func __ccgo_abiInternal_twalk_1(tls *TLS, dest, abi0CodePtr uintptr) {
 	f := func(_0 *TLS, _1 uintptr, _2 int32, _3 int32) {
-		 __ccgo_abi0_twalk_1(_0, _1, _2, _3, abi0CodePtr)
+		__ccgo_abi0_twalk_1(_0, _1, _2, _3, abi0CodePtr)
 	}
 	*(*[2]uintptr)(unsafe.Pointer(dest)) = *(*[2]uintptr)(unsafe.Pointer(*(*uintptr)(unsafe.Pointer(&f))))
 }
