@@ -27,7 +27,7 @@ baton resources
 ## docker
 
 ```
-docker run --rm -v $(pwd):/out -e BATON_SECRET_KEY=secretKey BATON_INTEGRATION_KEY=integrationKey BATON_API_HOSTNAME=apiHostname ghcr.io/conductorone/baton-duo:latest -f "/out/sync.c1z"
+docker run --rm -v $(pwd):/out -e BATON_SECRET_KEY=secretKey BATON_INTEGRATION_KEY=integrationKey BATON_API_HOSTNAME=apiHostname public.ecr.aws/conductorone/baton-duo:latest -f "/out/sync.c1z"
 docker run --rm -v $(pwd):/out ghcr.io/conductorone/baton:latest -f "/out/sync.c1z" resources
 ```
 
