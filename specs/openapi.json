@@ -1,0 +1,744 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Duo Admin API (baton-duo surface)",
+    "version": "2026-09-22",
+    "description": "The subset of the Duo Admin API that baton-duo calls. Scope is connector scope: nine operations, and only the response fields the connector's structs declare. Shapes and pagination behavior verified against https://duo.com/docs/adminapi (accessed 2026-09-22)."
+  },
+  "servers": [
+    {
+      "url": "https://{api_hostname}",
+      "description": "Per-tenant Duo API hostname, e.g. api-XXXXXXXX.duosecurity.com.",
+      "variables": {
+        "api_hostname": {
+          "default": "api-example.duosecurity.com"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "DuoSignature": []
+    }
+  ],
+  "paths": {
+    "/admin/v1/users": {
+      "get": {
+        "operationId": "listUsers",
+        "summary": "List users",
+        "description": "pkg/duo/client.go GetUsers. Paginated: cursor is metadata.next_offset -> offset; terminates when next_offset is absent.",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Offset from 0 at which to start this page. The connector sends \"0\" on the first page and metadata.next_offset thereafter.",
+            "schema": {
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Page size. The connector always sends 100 (paginationLimit). Supplying limit is what makes Duo return the metadata block.",
+            "schema": {
+              "type": "string",
+              "default": "100"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/admin/v1/users/{user_id}": {
+      "get": {
+        "operationId": "getUser",
+        "summary": "Get a single user",
+        "description": "pkg/duo/client.go GetUser. Not paginated.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/admin/v1/groups": {
+      "get": {
+        "operationId": "listGroups",
+        "summary": "List groups",
+        "description": "pkg/duo/client.go GetGroups. Paginated like /admin/v1/users.",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Offset from 0 at which to start this page. The connector sends \"0\" on the first page and metadata.next_offset thereafter.",
+            "schema": {
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Page size. The connector always sends 100 (paginationLimit). Supplying limit is what makes Duo return the metadata block.",
+            "schema": {
+              "type": "string",
+              "default": "100"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupsListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/admin/v2/groups/{group_id}/users": {
+      "get": {
+        "operationId": "listGroupUsers",
+        "summary": "List users in a group",
+        "description": "pkg/duo/client.go GetGroupUsers. Note this is the only v2 path the connector calls; every other operation is v1.",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Offset from 0 at which to start this page. The connector sends \"0\" on the first page and metadata.next_offset thereafter.",
+            "schema": {
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Page size. The connector always sends 100 (paginationLimit). Supplying limit is what makes Duo return the metadata block.",
+            "schema": {
+              "type": "string",
+              "default": "100"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupUsersListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/admin/v1/admins": {
+      "get": {
+        "operationId": "listAdmins",
+        "summary": "List administrators",
+        "description": "pkg/duo/client.go GetAdmins. Paginated like /admin/v1/users.",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Offset from 0 at which to start this page. The connector sends \"0\" on the first page and metadata.next_offset thereafter.",
+            "schema": {
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Page size. The connector always sends 100 (paginationLimit). Supplying limit is what makes Duo return the metadata block.",
+            "schema": {
+              "type": "string",
+              "default": "100"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminsListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/admin/v1/settings": {
+      "get": {
+        "operationId": "getAccountSettings",
+        "summary": "Get account settings",
+        "description": "pkg/duo/client.go GetAccount. Used for the account resource name. Not paginated.",
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/admin/v1/admin_roles": {
+      "get": {
+        "operationId": "listAdminRoles",
+        "summary": "List administrator roles",
+        "description": "pkg/duo/client.go GetRoles. Not paginated - the connector reads the whole response in one call.",
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/admin/v1/users/{user_id}/groups": {
+      "post": {
+        "operationId": "addUserToGroup",
+        "summary": "Add a user to a group",
+        "description": "pkg/duo/client.go AddUserToGroup. Body is form-encoded (application/x-www-form-urlencoded), not JSON.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "group_id"
+                ],
+                "properties": {
+                  "group_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Membership added.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatOnlyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/admin/v1/users/{user_id}/groups/{group_id}": {
+      "delete": {
+        "operationId": "removeUserFromGroup",
+        "summary": "Remove a user from a group",
+        "description": "pkg/duo/client.go RemoveUserFromGroup. No request body.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Membership removed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatOnlyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "DuoSignature": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "HTTP Basic where the username is the integration key and the password is an HMAC-SHA512 signature over the canonicalized request (pkg/duo/client.go sign). A matching RFC 1123 Date header is required and is part of the signed string."
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "Error. The connector does not branch on status: Duo signals failure in the 200 body via stat=\"FAIL\" plus code/message/message_detail, which the response schemas model. uhttp classifies transport-level statuses and 429 drives the rate-limit annotation."
+      }
+    },
+    "schemas": {
+      "ListResultMetadata": {
+        "type": "object",
+        "description": "Returned whenever the request supplies limit, which this client always does. Present on the last page carrying prev_offset and total_objects; only next_offset is omitted there. Duo docs: \"If not present in the metadata response, then there are no more pages of results left.\"",
+        "properties": {
+          "next_offset": {
+            "type": "integer",
+            "description": "Offset at which to start the next page. Absent on the last page."
+          },
+          "prev_offset": {
+            "type": "integer",
+            "description": "Offset at which the previous page started."
+          },
+          "total_objects": {
+            "type": "integer",
+            "description": "Total objects across all pages."
+          }
+        }
+      },
+      "UsersListResponse": {
+        "type": "object",
+        "required": [
+          "stat",
+          "response",
+          "metadata"
+        ],
+        "description": "Paginated users list.",
+        "properties": {
+          "stat": {
+            "type": "string",
+            "description": "\"OK\" or \"FAIL\". The connector treats \"FAIL\" as an error and reads code/message/message_detail."
+          },
+          "response": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/ListResultMetadata"
+          }
+        }
+      },
+      "GroupsListResponse": {
+        "type": "object",
+        "required": [
+          "stat",
+          "response",
+          "metadata"
+        ],
+        "description": "Paginated groups list.",
+        "properties": {
+          "stat": {
+            "type": "string",
+            "description": "\"OK\" or \"FAIL\". The connector treats \"FAIL\" as an error and reads code/message/message_detail."
+          },
+          "response": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Group"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/ListResultMetadata"
+          }
+        }
+      },
+      "GroupUsersListResponse": {
+        "type": "object",
+        "required": [
+          "stat",
+          "response",
+          "metadata"
+        ],
+        "description": "Paginated group-membership list.",
+        "properties": {
+          "stat": {
+            "type": "string",
+            "description": "\"OK\" or \"FAIL\". The connector treats \"FAIL\" as an error and reads code/message/message_detail."
+          },
+          "response": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/ListResultMetadata"
+          }
+        }
+      },
+      "AdminsListResponse": {
+        "type": "object",
+        "required": [
+          "stat",
+          "response",
+          "metadata"
+        ],
+        "description": "Paginated administrators list.",
+        "properties": {
+          "stat": {
+            "type": "string",
+            "description": "\"OK\" or \"FAIL\". The connector treats \"FAIL\" as an error and reads code/message/message_detail."
+          },
+          "response": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Admin"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/ListResultMetadata"
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "required": [
+          "stat",
+          "response"
+        ],
+        "description": "Single user.",
+        "properties": {
+          "stat": {
+            "type": "string"
+          },
+          "response": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "AccountResponse": {
+        "type": "object",
+        "required": [
+          "stat",
+          "response"
+        ],
+        "description": "Account settings.",
+        "properties": {
+          "stat": {
+            "type": "string"
+          },
+          "response": {
+            "$ref": "#/components/schemas/Account"
+          }
+        }
+      },
+      "RolesResponse": {
+        "type": "object",
+        "required": [
+          "stat",
+          "response"
+        ],
+        "description": "Administrator roles. Not paginated in this client.",
+        "properties": {
+          "stat": {
+            "type": "string"
+          },
+          "response": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        }
+      },
+      "StatOnlyResponse": {
+        "type": "object",
+        "required": [
+          "stat"
+        ],
+        "description": "Provisioning responses. The connector reads only stat plus the error fields.",
+        "properties": {
+          "stat": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "message_detail": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "description": "Only the fields baton-duo reads. user_id is the user resource ID.",
+        "properties": {
+          "user_id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstname": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "realname": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "created": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unix timestamp."
+          },
+          "last_login": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unix timestamp."
+          }
+        }
+      },
+      "Group": {
+        "type": "object",
+        "description": "Only the fields baton-duo reads. group_id is the group resource ID.",
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "Admin": {
+        "type": "object",
+        "description": "Only the fields baton-duo reads. admin_id is the admin resource ID; role_id links to Role.",
+        "properties": {
+          "admin_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "role_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "Account": {
+        "type": "object",
+        "description": "Only the name is read, for the account resource.",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Role": {
+        "type": "object",
+        "description": "Only the fields baton-duo reads. role_id is the role resource ID.",
+        "properties": {
+          "role_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "in_use": {
+            "type": "boolean"
+          },
+          "is_custom": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

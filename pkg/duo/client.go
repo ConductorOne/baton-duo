@@ -56,6 +56,20 @@ type ListResultMetadata struct {
 	TotalObjects json.Number `json:"total_objects"`
 }
 
+// paginationMetadata is the metadata block Duo returns whenever a request supplies limit,
+// which this client always does. Duo keeps the block on the last page - carrying
+// prev_offset and total_objects - and omits only next_offset, so a nil Metadata means the
+// block went missing rather than the list having ended.
+type paginationMetadata struct {
+	Metadata *ListResultMetadata `json:"metadata"`
+}
+
+// HasPaginationData satisfies uhttp.PaginatedResponse, so a page that came back without
+// metadata fails the request instead of yielding an empty offset and ending the sync.
+func (p *paginationMetadata) HasPaginationData() bool {
+	return p.Metadata != nil
+}
+
 type ErrorResponse struct {
 	Code          int64  `json:"code,omitempty"`
 	Message       string `json:"message,omitempty"`
@@ -64,30 +78,30 @@ type ErrorResponse struct {
 
 type UsersResponse struct {
 	ErrorResponse
-	Metadata ListResultMetadata `json:"metadata"`
-	Response []User             `json:"response"`
-	Stat     string             `json:"stat"`
+	paginationMetadata
+	Response []User `json:"response"`
+	Stat     string `json:"stat"`
 }
 
 type GroupsResponse struct {
 	ErrorResponse
-	Metadata ListResultMetadata `json:"metadata"`
-	Stat     string             `json:"stat"`
-	Response []Group            `json:"response,omitempty"`
+	paginationMetadata
+	Stat     string  `json:"stat"`
+	Response []Group `json:"response,omitempty"`
 }
 
 type GroupUsersResponse struct {
 	ErrorResponse
-	Metadata ListResultMetadata `json:"metadata"`
-	Stat     string             `json:"stat"`
-	Response []User             `json:"response"`
+	paginationMetadata
+	Stat     string `json:"stat"`
+	Response []User `json:"response"`
 }
 
 type AdminsResponse struct {
 	ErrorResponse
-	Metadata ListResultMetadata `json:"metadata"`
-	Stat     string             `json:"stat"`
-	Response []Admin            `json:"response"`
+	paginationMetadata
+	Stat     string  `json:"stat"`
+	Response []Admin `json:"response"`
 }
 
 type UserResponse struct {
@@ -229,11 +243,8 @@ func (c *Client) GetUsers(ctx context.Context, offset string) ([]User, string, e
 		return nil, "", wrapError(res.ErrorResponse, "error fetching users")
 	}
 
-	if (res.Metadata != ListResultMetadata{}) {
-		return res.Response, res.Metadata.NextOffset.String(), nil
-	}
-
-	return res.Response, "", nil
+	// WithPaginationData already failed the request if Duo omitted metadata.
+	return res.Response, res.Metadata.NextOffset.String(), nil
 }
 
 // GetGroups returns all groups.
@@ -257,11 +268,8 @@ func (c *Client) GetGroups(ctx context.Context, offset string) ([]Group, string,
 		return nil, "", wrapError(res.ErrorResponse, "error fetching groups")
 	}
 
-	if (res.Metadata != ListResultMetadata{}) {
-		return res.Response, res.Metadata.NextOffset.String(), nil
-	}
-
-	return res.Response, "", nil
+	// WithPaginationData already failed the request if Duo omitted metadata.
+	return res.Response, res.Metadata.NextOffset.String(), nil
 }
 
 // GetGroupUsers returns all users in a group.
@@ -285,11 +293,8 @@ func (c *Client) GetGroupUsers(ctx context.Context, groupId string, offset strin
 		return nil, "", wrapError(res.ErrorResponse, "error fetching group users")
 	}
 
-	if (res.Metadata != ListResultMetadata{}) {
-		return res.Response, res.Metadata.NextOffset.String(), nil
-	}
-
-	return res.Response, "", nil
+	// WithPaginationData already failed the request if Duo omitted metadata.
+	return res.Response, res.Metadata.NextOffset.String(), nil
 }
 
 // GetAdmins returns all admins.
@@ -313,11 +318,8 @@ func (c *Client) GetAdmins(ctx context.Context, offset string) ([]Admin, string,
 		return nil, "", wrapError(res.ErrorResponse, "error fetching admins")
 	}
 
-	if (res.Metadata != ListResultMetadata{}) {
-		return res.Response, res.Metadata.NextOffset.String(), nil
-	}
-
-	return res.Response, "", nil
+	// WithPaginationData already failed the request if Duo omitted metadata.
+	return res.Response, res.Metadata.NextOffset.String(), nil
 }
 
 // GetUser returns a user by ID.
@@ -454,11 +456,18 @@ func (c *Client) do(uri string, req *http.Request, resType interface{}, params u
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	var rl v2.RateLimitDescription
-	// #nosec G704 -- URL is config baseUrl + fixed path pattern, not user-controlled
-	resp, err := c.wrapper.Do(req,
+	doOptions := []uhttp.DoOption{
 		uhttp.WithJSONResponse(resType),
 		uhttp.WithRatelimitData(&rl),
-	)
+	}
+	// A response type that reports its own pagination data is additionally checked for it,
+	// so a page arriving without metadata fails here instead of ending the sync.
+	if paginated, ok := resType.(uhttp.PaginatedResponse); ok {
+		doOptions = append(doOptions, uhttp.WithPaginationData(paginated))
+	}
+
+	// #nosec G704 -- URL is config baseUrl + fixed path pattern, not user-controlled
+	resp, err := c.wrapper.Do(req, doOptions...)
 	if resp != nil {
 		defer resp.Body.Close()
 	}
